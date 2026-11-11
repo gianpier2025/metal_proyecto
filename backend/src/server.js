@@ -14,13 +14,14 @@ const app = express();
 const PORT = Number(process.env.PORT || 3000);
 const allowedOrigins = (process.env.CLIENT_ORIGIN || 'http://localhost:5173')
   .split(',')
-  .map((origin) => origin.trim())
+  .map((origin) => origin.trim().replace(/\/+$/, ''))
   .filter(Boolean);
+const renderFrontendOrigin = 'https://metal-proyecto-frontend-qv0u.onrender.com';
 
 app.disable('x-powered-by');
 app.use(cors({
   origin(origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+    if (!origin || allowedOrigins.includes(origin) || origin === renderFrontendOrigin) return callback(null, true);
     return callback(new Error('El origen no está permitido por CORS.'));
   },
   methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
