@@ -14,7 +14,7 @@ API Express para trabajadores, asistencias, contratos, reportes y administració
 
 ## Publicar frontend y backend en Render
 
-El archivo `render.yaml` define dos servicios para la rama `main`: la API Node del workspace `backend` y el sitio estático Vite del workspace `frontend`. En Render, crea un **Blueprint** y conecta el repositorio de GitHub `metal_proyecto` usando la rama `main`. Render usará el `render.yaml` del repositorio para crear ambos servicios.
+El archivo `render.yaml` define dos servicios para la rama `branch_gianpierre`: la API Node del workspace `backend` y el sitio estático Vite del workspace `frontend`. En Render, crea un **Blueprint** y conecta el repositorio de GitHub `metal_proyecto`. Render usará el `render.yaml` del repositorio para crear ambos servicios.
 
 Al crear el Blueprint, completa las variables solicitadas para la API:
 
