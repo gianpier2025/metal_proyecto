@@ -1,0 +1,43 @@
+services:
+  - type: web
+    name: metal-proyecto-api
+    runtime: node
+    plan: free
+    branch: branch_gianpierre
+    buildCommand: npm ci
+    startCommand: npm run start --workspace=backend
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_PUBLISHABLE_KEY
+        sync: false
+      - key: SUPABASE_SECRET_KEY
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: DATABASE_SSL_CA_PATH
+        value: prod-ca-2021.crt
+      - key: CLIENT_ORIGIN
+        sync: false
+      - key: AUTH_REDIRECT_URL
+        sync: false
+
+  - type: web
+    name: metal-proyecto-frontend
+    runtime: static
+    branch: branch_gianpierre
+    buildCommand: npm ci && npm run build --workspace=frontend
+    staticPublishPath: frontend/dist
+    envVars:
+      - key: VITE_SUPABASE_URL
+        sync: false
+      - key: VITE_SUPABASE_PUBLISHABLE_KEY
+        sync: false
+      - key: VITE_API_BASE_URL
+        fromService:
+          type: web
+          name: metal-proyecto-api
+          envVarKey: RENDER_EXTERNAL_HOSTNAME
