@@ -21,7 +21,7 @@ services:
       - key: DATABASE_SSL_CA_PATH
         value: prod-ca-2021.crt
       - key: CLIENT_ORIGIN
-        sync: false
+        value: https://metal-proyecto-frontend-qv0u.onrender.com
       - key: AUTH_REDIRECT_URL
         sync: false
 
