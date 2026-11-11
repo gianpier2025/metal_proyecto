@@ -29,7 +29,7 @@ services:
     name: metal-proyecto-frontend
     runtime: static
     branch: main
-    buildCommand: npm ci && npm run build --workspace=frontend
+    buildCommand: npm ci --include=dev && npm run build --workspace=frontend
     staticPublishPath: frontend/dist
     envVars:
       - key: VITE_SUPABASE_URL
