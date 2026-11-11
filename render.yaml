@@ -3,7 +3,7 @@ services:
     name: metal-proyecto-api
     runtime: node
     plan: free
-    branch: branch_gianpierre
+    branch: main
     buildCommand: npm ci
     startCommand: npm run start --workspace=backend
     healthCheckPath: /api/health
@@ -28,7 +28,7 @@ services:
   - type: web
     name: metal-proyecto-frontend
     runtime: static
-    branch: branch_gianpierre
+    branch: main
     buildCommand: npm ci && npm run build --workspace=frontend
     staticPublishPath: frontend/dist
     envVars:
