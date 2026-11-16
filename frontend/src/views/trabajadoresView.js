@@ -124,73 +124,98 @@ export function renderTrabajadorModal(isEdit = false, trabajador = null) {
             <form id="trabajadorForm" novalidate>
               <input type="hidden" id="trabajadorId" value="${trabajador?.id ?? ''}">
 
-              <div class="row g-3">
-                <div class="col-md-6">
-                  <label class="db-form-label" for="trNombres">Nombres <span class="text-danger">*</span></label>
-                  <input type="text" class="form-control db-form-control" id="trNombres" value="${trabajador?.nombres ?? ''}" required>
-                  <div class="invalid-feedback">Ingrese los nombres</div>
+              <section class="mb-4" aria-labelledby="trabajadorIdentificacionTitulo">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                  <span class="badge rounded-pill text-bg-primary">1</span>
+                  <div>
+                    <h6 class="mb-0" id="trabajadorIdentificacionTitulo">Identificación</h6>
+                    <small class="text-muted">Ingresa el DNI para completar los datos disponibles.</small>
+                  </div>
                 </div>
-                <div class="col-md-6">
-                  <label class="db-form-label" for="trApellidos">Apellidos <span class="text-danger">*</span></label>
-                  <input type="text" class="form-control db-form-control" id="trApellidos" value="${trabajador?.apellidos ?? ''}" required>
-                  <div class="invalid-feedback">Ingrese los apellidos</div>
+                <label class="db-form-label" for="trDni">DNI <span class="text-danger">*</span></label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light"><i class="bi bi-person-vcard text-primary"></i></span>
+                  <input type="text" class="form-control db-form-control" id="trDni" maxlength="8" inputmode="numeric" autocomplete="off" pattern="[0-9]{8}" value="${trabajador?.dni ?? ''}" placeholder="8 dígitos" aria-describedby="trDniAyuda" required>
+                  ${!isEdit ? '<button type="button" class="btn-db-primary" id="btnConsultarDni"><i class="bi bi-search me-1"></i>Consultar</button>' : ''}
                 </div>
-              </div>
+                <div class="invalid-feedback" id="trDniError">El DNI debe tener 8 dígitos.</div>
+                <small class="text-muted d-block mt-1" id="trDniAyuda">La consulta te ayudará a completar nombres y apellidos.</small>
+                ${!isEdit ? '<div class="small mt-2" id="dniLookupFeedback" aria-live="polite"></div>' : ''}
+              </section>
 
-              <div class="row g-3 mt-0">
-                <div class="col-md-4">
-                  <label class="db-form-label" for="trDni">DNI <span class="text-danger">*</span></label>
-                  <input type="text" class="form-control db-form-control" id="trDni" maxlength="8" pattern="[0-9]{8}" value="${trabajador?.dni ?? ''}" placeholder="12345678" required>
-                  <div class="invalid-feedback">DNI debe tener 8 dígitos</div>
+              <section class="mb-4" aria-labelledby="trabajadorDatosTitulo">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                  <span class="badge rounded-pill text-bg-primary">2</span>
+                  <div>
+                    <h6 class="mb-0" id="trabajadorDatosTitulo">Datos personales</h6>
+                    <small class="text-muted">${isEdit ? 'Revisa y actualiza la información personal.' : 'Verifica los datos consultados y completa lo que falte.'}</small>
+                  </div>
                 </div>
-                <div class="col-md-4">
-                  <label class="db-form-label" for="trCargo">Cargo <span class="text-danger">*</span></label>
-                  <select class="form-select db-form-control" id="trCargo" required>
-                    <option value="">Seleccionar...</option>
-                    ${cargoOptions}
-                  </select>
-                  <div class="invalid-feedback">Seleccione un cargo</div>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label class="db-form-label" for="trNombres">Nombres <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control db-form-control" id="trNombres" autocomplete="given-name" value="${trabajador?.nombres ?? ''}" required>
+                    <div class="invalid-feedback">Ingrese los nombres</div>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="db-form-label" for="trApellidos">Apellidos <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control db-form-control" id="trApellidos" autocomplete="family-name" value="${trabajador?.apellidos ?? ''}" required>
+                    <div class="invalid-feedback">Ingrese los apellidos</div>
+                  </div>
+                  <div class="col-12">
+                    <label class="db-form-label" for="trDireccion">Dirección</label>
+                    <input type="text" class="form-control db-form-control" id="trDireccion" autocomplete="street-address" value="${trabajador?.direccion ?? ''}" placeholder="Av. / Jr. / Calle, distrito">
+                  </div>
                 </div>
-                <div class="col-md-4">
-                  <label class="db-form-label" for="trEstado">Estado</label>
-                  <select class="form-select db-form-control" id="trEstado">
-                    ${estadoOptions}
-                  </select>
-                </div>
-              </div>
+              </section>
 
-              <div class="row g-3 mt-0">
-                <div class="col-md-6">
-                  <label class="db-form-label" for="trTelefono">Teléfono</label>
-                  <input type="tel" class="form-control db-form-control" id="trTelefono" value="${trabajador?.telefono ?? ''}" placeholder="999999999">
+              <section aria-labelledby="trabajadorLaboralTitulo">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                  <span class="badge rounded-pill text-bg-primary">3</span>
+                  <div>
+                    <h6 class="mb-0" id="trabajadorLaboralTitulo">Información laboral y contacto</h6>
+                    <small class="text-muted">Completa manualmente los datos del puesto y contacto.</small>
+                  </div>
                 </div>
-                <div class="col-md-6">
-                  <label class="db-form-label" for="trEmail">Correo Electrónico</label>
-                  <input type="email" class="form-control db-form-control" id="trEmail" value="${trabajador?.email ?? ''}" placeholder="nombre@dbelecmec.com">
-                  <div class="invalid-feedback">Ingrese un correo válido</div>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label class="db-form-label" for="trCargo">Cargo <span class="text-danger">*</span></label>
+                    <select class="form-select db-form-control" id="trCargo" required>
+                      <option value="">Seleccionar cargo...</option>
+                      ${cargoOptions}
+                    </select>
+                    <div class="invalid-feedback">Seleccione un cargo</div>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="db-form-label" for="trEstado">Estado</label>
+                    <select class="form-select db-form-control" id="trEstado">
+                      ${estadoOptions}
+                    </select>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="db-form-label" for="trTelefono">Teléfono</label>
+                    <input type="tel" class="form-control db-form-control" id="trTelefono" autocomplete="tel" value="${trabajador?.telefono ?? ''}" placeholder="999 999 999">
+                  </div>
+                  <div class="col-md-6">
+                    <label class="db-form-label" for="trEmail">Correo electrónico</label>
+                    <input type="email" class="form-control db-form-control" id="trEmail" autocomplete="email" value="${trabajador?.email ?? ''}" placeholder="nombre@empresa.com">
+                    <div class="invalid-feedback">Ingrese un correo válido</div>
+                  </div>
+                  <div class="col-md-4">
+                    <label class="db-form-label" for="trFechaIngreso">Fecha de ingreso</label>
+                    <input type="date" class="form-control db-form-control" id="trFechaIngreso" value="${trabajador?.fechaIngreso ?? ''}">
+                  </div>
+                  <div class="col-md-4">
+                    <label class="db-form-label" for="trSalario">Salario base (S/)</label>
+                    <input type="number" class="form-control db-form-control" id="trSalario" min="0" step="50" value="${trabajador?.salarioBase ?? ''}" placeholder="1500">
+                  </div>
+                  <div class="col-md-4">
+                    <label class="db-form-label" for="trTarifa">Tarifa por hora (S/) <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control db-form-control" id="trTarifa" min="0" step="0.01" value="${trabajador?.tarifaPorHora ?? ''}" placeholder="35.50" required>
+                    <div class="invalid-feedback">Ingrese la tarifa por hora acordada</div>
+                  </div>
                 </div>
-              </div>
-
-              <div class="row g-3 mt-0">
-                <div class="col-md-4">
-                  <label class="db-form-label" for="trFechaIngreso">Fecha de Ingreso</label>
-                  <input type="date" class="form-control db-form-control" id="trFechaIngreso" value="${trabajador?.fechaIngreso ?? ''}">
-                </div>
-                <div class="col-md-4">
-                  <label class="db-form-label" for="trSalario">Salario Base (S/)</label>
-                  <input type="number" class="form-control db-form-control" id="trSalario" min="0" step="50" value="${trabajador?.salarioBase ?? ''}" placeholder="1500">
-                </div>
-                <div class="col-md-4">
-                  <label class="db-form-label" for="trTarifa">Tarifa por Hora (S/)</label>
-                  <input type="number" class="form-control db-form-control" id="trTarifa" min="0" step="0.01" value="${trabajador?.tarifaPorHora ?? ''}" placeholder="Ej. 35.50" required>
-                  <div class="invalid-feedback">Ingrese la tarifa por hora acordada</div>
-                </div>
-              </div>
-
-              <div class="mt-3">
-                <label class="db-form-label" for="trDireccion">Dirección</label>
-                <input type="text" class="form-control db-form-control" id="trDireccion" value="${trabajador?.direccion ?? ''}" placeholder="Av. / Jr. / Calle, distrito">
-              </div>
+              </section>
             </form>
           </div>
           <div class="modal-footer">

@@ -1,6 +1,10 @@
 import { apiRequest } from './apiClient.js';
 
 export const trabajadoresService = {
+  async consultarDni(dni) {
+    return apiRequest(`/trabajadores/consulta-dni/${encodeURIComponent(dni)}`);
+  },
+
   async getAll() {
     return apiRequest('/trabajadores');
   },

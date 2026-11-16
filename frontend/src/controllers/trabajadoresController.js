@@ -84,6 +84,63 @@ function openModal(isEdit, trabajador = null) {
 
   const saveBtn = document.getElementById('btnGuardarTrabajador');
   saveBtn.addEventListener('click', () => handleSave(isEdit));
+
+  if (!isEdit) {
+    document.getElementById('btnConsultarDni')?.addEventListener('click', handleConsultarDni);
+    document.getElementById('trDni')?.addEventListener('input', () => {
+      const feedback = document.getElementById('dniLookupFeedback');
+      if (feedback) feedback.textContent = '';
+    });
+  }
+}
+
+async function handleConsultarDni(event) {
+  const dniField = document.getElementById('trDni');
+  const button = event.currentTarget;
+  const dni = dniField.value.trim();
+  dniField.classList.remove('is-invalid');
+  const feedback = document.getElementById('dniLookupFeedback');
+  if (!/^\d{8}$/.test(dni)) {
+    dniField.classList.add('is-invalid');
+    if (feedback) {
+      feedback.className = 'small mt-2 text-danger';
+      feedback.textContent = 'Revisa el número: se requieren exactamente 8 dígitos.';
+    }
+    toast('Ingresa un DNI válido de 8 dígitos', 'warning');
+    dniField.focus();
+    return;
+  }
+
+  button.disabled = true;
+  button.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Consultando...';
+  if (feedback) {
+    feedback.className = 'small mt-2 text-muted';
+    feedback.textContent = 'Buscando los datos del DNI...';
+  }
+  try {
+    const person = await trabajadoresService.consultarDni(dni);
+    if (person.dni !== dni) throw new Error('El servicio devolvió datos para un DNI distinto.');
+    document.getElementById('trNombres').value = person.nombres || '';
+    document.getElementById('trApellidos').value = [person.apellidoPaterno, person.apellidoMaterno].filter(Boolean).join(' ');
+    const direccion = document.getElementById('trDireccion');
+    if (!direccion.value.trim()) direccion.value = person.direccion || '';
+    if (feedback) {
+      feedback.className = 'small mt-2 text-success';
+      feedback.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i>Datos encontrados. Revísalos y continúa con la información laboral.';
+    }
+    document.getElementById('trNombres')?.focus({ preventScroll: true });
+    document.getElementById('trNombres')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    toast('Datos encontrados. Revísalos antes de registrar al trabajador.', 'success');
+  } catch (error) {
+    if (feedback) {
+      feedback.className = 'small mt-2 text-danger';
+      feedback.textContent = error.message || 'No se pudo consultar el DNI. Puedes completar los datos manualmente.';
+    }
+    toast(error.message || 'No se pudo consultar el DNI', 'danger');
+  } finally {
+    button.disabled = false;
+    button.innerHTML = '<i class="bi bi-search me-1"></i>Consultar DNI';
+  }
 }
 
 function handleSave(isEdit) {
