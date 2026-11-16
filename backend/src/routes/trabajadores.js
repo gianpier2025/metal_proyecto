@@ -9,6 +9,47 @@ const columns = `id, dni, nombres, apellidos, cargo, estado, telefono, email,
   fecha_ingreso, direccion, salario_base, tarifa_por_hora, created_at, updated_at`;
 const states = new Set(['Activo', 'En Licencia', 'Inactivo']);
 
+router.get('/consulta-dni/:dni', requireRole('admin', 'rrhh'), asyncHandler(async (req, res) => {
+  const dni = String(req.params.dni || '').trim();
+  if (!/^\d{8}$/.test(dni)) throw new HttpError(400, 'El DNI debe tener 8 dígitos.');
+
+  const token = process.env.FACTILIZA_API_TOKEN?.trim();
+  if (!token) throw new HttpError(503, 'La consulta de DNI no está configurada en el servidor.');
+
+  let response;
+  try {
+    response = await fetch(`https://api.factiliza.com/v1/dni/info/${dni}`, {
+      headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
+      signal: AbortSignal.timeout(10_000),
+    });
+  } catch {
+    throw new HttpError(502, 'No se pudo conectar con el servicio de consulta de DNI.');
+  }
+
+  let result;
+  try {
+    result = await response.json();
+  } catch {
+    throw new HttpError(502, 'El servicio de consulta de DNI devolvió una respuesta no válida.');
+  }
+
+  if (!response.ok || result?.success !== true || !result?.data) {
+    const status = response.status === 404 ? 404 : response.status === 429 ? 503 : 502;
+    throw new HttpError(status, status === 404
+      ? 'No se encontraron datos para ese DNI.'
+      : 'No fue posible consultar el DNI. Inténtalo de nuevo.');
+  }
+
+  const person = result.data;
+  res.json({
+    dni: String(person.numero || dni),
+    nombres: person.nombres || '',
+    apellidoPaterno: person.apellido_paterno || '',
+    apellidoMaterno: person.apellido_materno || '',
+    direccion: person.direccion_completa || person.direccion || '',
+  });
+}));
+
 function validateWorker(body, partial = false) {
   const values = {};
   if (!partial || body.dni !== undefined) {
